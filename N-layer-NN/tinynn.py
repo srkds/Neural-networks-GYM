@@ -20,14 +20,15 @@ def initialize_network(layer_dims):
     # *** output
     # parameters - dictionary of the paramenters of the layers
 
+    np.random.seed(1)
     L = len(layer_dims)
     parameters = {}
     
-    parameters['W1'] = np.random.randn(layer_dims[1], layer_dims[0])*0.01
+    parameters['W1'] = np.random.randn(layer_dims[1], layer_dims[0]) / np.sqrt(layer_dims[0]) #*0.01
     parameters['b1'] = np.zeros((layer_dims[1], 1))
 
     for l in range(2, L):
-        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l-1])*0.01
+        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l-1]) / np.sqrt(layer_dims[l-1])  #*0.01
         parameters['b' + str(l)] = np.zeros((layer_dims[l], 1))
 
     return parameters
@@ -76,8 +77,9 @@ def forward_pass(X, parameters):
     return AL, caches
 
 def calculate_cost(AL, Y):
-    m = len(Y)
+    m = Y.shape[1]
     J = -np.sum(np.multiply(Y, np.log(AL)) + np.multiply((1-Y), np.log(1-AL))) / m
+    J = np.squeeze(J)
     return J
 
 def linear_backward(dZ, cache):
@@ -95,12 +97,12 @@ def activation_backward(dA, cache):
 
     if activation == 'relu':
         mask = Z <= 0
-        dZ = np.zeros(Z.shape)
+        dZ = np.array(dA, copy=True)
         dZ[mask] = 0
-        dZ[~mask] = 1
-        dZ = np.multiply(dZ, dA)
+        # dZ[~mask] = 1
+        # dZ = np.multiply(dZ, dA)
     else:
-        A, _ = activation_forward(Z, activation)
+        A = 1 / (1+np.exp(-Z))
         dZ = np.multiply(np.multiply(A, (1 - A)), dA)
     
     return dZ
@@ -155,20 +157,28 @@ def update_parameters(params, grads, learning_rate):
 
 def train(X, Y, layer_dims, learning_rate=0.1, iteration=1000):
 
+    np.random.seed(1)
     parameters = initialize_network(layer_dims=layer_dims)
     costs = []
+    w1_grads = []
+    all_cost = []
     for i in range(iteration):
         Al, caches = forward_pass(X, parameters=parameters)
 
         cost = calculate_cost(Al, Y)    
 
+        w1_grads.append(parameters['W1'][0][0])
+        all_cost.append(cost)
         grads = backward_pass(Al, Y, caches)
         parameters = update_parameters(parameters, grads, learning_rate)
         if (i % 100 == 0 or i == iteration - 1):
             print("Cost after iteration {}: {}".format(i, np.squeeze(cost)))
         if i % 100 == 0:
             costs.append(cost)
-    return parameters, costs
+    return parameters, costs, w1_grads, all_cost
+
+def hello():
+    print("Hello from tiny")
 
 if __name__ == '__main__':
 
