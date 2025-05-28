@@ -1,24 +1,37 @@
-import numpy as np
-import copy
+"""
+Tiny Neural Network
+--------------------
 
-np.random.seed(1)
-# Tiny NN
-""" 
+Implements following
 
- - Initializing the neural networks.
+ - Initializing the neural networks (n layers, and n nodes).
  - Forward pass
  - Calculate the cost
  - Backward pass
- - Update the parameters 
-
+ - Update the parameters
+ - Training loop
+ - save and load model
 
 """
 
+import numpy as np
+import copy
+import h5py
+
+np.random.seed(1)
+
 def initialize_network(layer_dims):
-    # *** input
-    # layer_dims - array of no of units in each layer
-    # *** output
-    # parameters - dictionary of the paramenters of the layers
+    """
+    Initializing the neural network weights. 
+    W1 - a matrix of dimention (no of nodes in current layer, no of input) --> row represents no of nodes in current layer and column represents weights of that node.
+    b1 - a matrix of dimention (no of nodes, 1), as there will be 1 bias per node
+
+    Parameters:
+    layer_dims -- array of no of units in each layer
+
+    returns:
+    parameters -- dictionary of the paramenters of the layers
+    """
 
     np.random.seed(1)
     L = len(layer_dims)
@@ -35,6 +48,9 @@ def initialize_network(layer_dims):
 
 
 def activation_forward(Z, activation):
+    """
+    A = g(Z), where g() can be any activation/non linear function. Here I have implemented relu and sigmoid.0
+    """
     if activation == 'relu':
         A = np.maximum(0, Z)
     else: 
@@ -43,6 +59,9 @@ def activation_forward(Z, activation):
     return A, cache
 
 def linear_forward(W, Ap, b):
+    """
+    Z = W.X + b
+    """
     Z = np.dot(W, Ap) + b
     cache = (Ap, W, b)
     return Z, cache
@@ -55,9 +74,11 @@ def linear_activation_forward(W, Ap, b, activation):
     return A, cache
 
 def forward_pass(X, parameters):
-    
-    # Zi = WX+b
-    # Ai = activation(Zi)
+    """
+    Zi = WX+b
+    Ai = activation(Zi)
+    """
+     
     caches = []
     L = len(parameters)//2
 
@@ -100,7 +121,7 @@ def activation_backward(dA, cache):
         dZ = np.array(dA, copy=True)
         dZ[mask] = 0
         # dZ[~mask] = 1
-        # dZ = np.multiply(dZ, dA)
+        # dZ = np.multiply(dZ, dA) # both the ways are correct
     else:
         A = 1 / (1+np.exp(-Z))
         dZ = np.multiply(np.multiply(A, (1 - A)), dA)
@@ -117,17 +138,12 @@ def linear_activation_backwards(dA, cache):
 def backward_pass(AL, Y, caches):
     grads = {}
     L = len(caches)
-    # print(caches)
     m = AL.shape[1]
     Y = Y.reshape(AL.shape)
 
     dAL = -(np.divide(Y, AL) - np.divide(1-Y, 1-AL))
 
     current_cache = caches[L-1]
-    # print(current_cache)
-    # a, b = current_cache
-    # print(len(a), len(b))
-    # a1, a2 = b
     dA_prev, dW, db =  linear_activation_backwards(dAL, current_cache)
 
     grads['dW'+str(L)] = dW
@@ -177,8 +193,46 @@ def train(X, Y, layer_dims, learning_rate=0.1, iteration=1000):
             costs.append(cost)
     return parameters, costs, w1_grads, all_cost
 
-def hello():
-    print("Hello from tiny")
+def predict(parameters, X):
+    logits, _ = forward_pass(X, parameters)
+
+    logits[logits > 0.5] = 1
+    logits[logits <= 0.5] = 0
+    return logits
+
+def get_accuracy(parameters, X, Y):
+    logits, _ = forward_pass(X, parameters)
+    
+    mask = np.zeros(logits.shape)
+    mask = logits > 0.5
+    m = logits.shape[1]
+    
+    accuracy = np.sum((mask == Y)/m)  
+    
+    print('Accuracy: ', accuracy)
+    
+    return accuracy
+
+def save_model(params, fname):
+    """
+    Save a learned parameters to h5py file
+
+    Parameters: 
+    params (dictionary) -- of the trained parameters weights and biases
+    fname (string) -- that we want to give to the model
+    """
+
+    with h5py.File(fname+'.h5', 'w') as f:
+        for key, value in params.items():
+            f.create_dataset(key, data=value)
+
+def load_model(model_path):
+    loaded_params = {}
+    with h5py.File(model_path, 'r') as f:
+        for key in f.keys():
+            loaded_params[key] = f[key][:]
+
+    return loaded_params
 
 if __name__ == '__main__':
 
@@ -198,7 +252,7 @@ if __name__ == '__main__':
     # Initialize parameters
     layer_dims = np.array([nx, 20, 7, 5, 1]) # [input_feature, # of units in layer1, # of units in layer 2,...., op units]
 
-    parameters, costs = train(X, Y, layer_dims=layer_dims, learning_rate=0.01, iteration=2000)
+    parameters, costs, _, _ = train(X, Y, layer_dims=layer_dims, learning_rate=0.01, iteration=2000)
     # params = initialize_network(layer_dims=layer_dims)
     # print(params)
     # assert len(layer_dims)-1 == len(params)//2 
