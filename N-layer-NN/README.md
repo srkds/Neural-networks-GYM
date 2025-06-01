@@ -13,6 +13,33 @@ the layer_dims will be 9, 4, 4, 1. In addition to it the hidden layers will have
 
 Requirements:
 
+```
 h5py
 numpy
 matplotlib
+```
+
+## Setup
+
+- create a new `py` file
+- import `tinynn.py`
+- Create a dataset `X` training set of shape $ X \in \mathbb{R}^{(nx, m)} $ where $nx$ is feature dimention and $m$ is no of trainig examples
+- Create Y that is true labels of shape $(1,m)$.
+
+```py
+from tinynn import *
+
+
+X # (nx, m)
+Y # (1, m)
+
+layer_dims = np.array([nx, 5,2,1])
+
+parameters, cost, w1_l, cost_l =  train(X, Y, layer_dims, learning_rate=0.0075, iteration=3000)
+
+
+# prediction of trained parameters
+test # i/p to nn of shape (nx, no of examples)
+
+predict(parameters, test)
+```
