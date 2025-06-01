@@ -23,7 +23,7 @@ matplotlib
 
 - create a new `py` file
 - import `tinynn.py`
-- Create a dataset `X` training set of shape $ X \in \mathbb{R}^{(nx, m)} $ where $nx$ is feature dimention and $m$ is no of trainig examples
+- Create a dataset `X` training set of shape $X \in \mathbb{R}^{(nx, m)}$ where $nx$ is feature dimention and $m$ is no of trainig examples
 - Create Y that is true labels of shape $(1,m)$.
 
 ```py
