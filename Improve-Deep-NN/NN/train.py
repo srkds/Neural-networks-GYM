@@ -26,7 +26,8 @@ print("nx", nx)
     # Define network
 layer_dims = [nx, 10, 5, 1]
 
-parameters = train(X, Y, layer_dims, learning_rate=args.lr, epochs=args.epochs, lambd=args.lambd)
+dropout_size = [0,1,0]
+parameters = train(X, Y, layer_dims, learning_rate=args.lr, epochs=args.epochs, lambd=args.lambd, dropout_size=dropout_size)
 preds = predict(parameters, X)
 
 print("Actual: ", Y)

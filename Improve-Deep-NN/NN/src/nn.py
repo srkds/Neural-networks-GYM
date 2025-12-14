@@ -49,6 +49,7 @@ def initialize_parameters(layer_dims):
 # Linear quation
 
 def linear(W, X, b):
+    print(f"W {W.shape}, X {X.shape}")
     Z = np.dot(W,X) + b
     cache = (W, X)
     return Z, cache
@@ -64,25 +65,42 @@ def activation(Z, a_name="relu"):
     cache = (Z, A, a_name)
     return A, cache
 
-def neuron(W, X, b, a_name="relu"):
+def dropout(A, keep_prob=0.5):
+    D = np.random.rand(A.shape[0], A.shape[1])
+    D = (D < keep_prob).astype(int)
+    A = A*D
+    A = A/keep_prob
+    cache = (D, keep_prob)
+    print(A.shape)
+    return A, cache
+
+def neuron(W, X, b, a_name="relu", drpout=False, keep_prob=0.5):
     Z, linear_cache = linear(W, X, b)
     A, activation_cache = activation(Z, a_name)
+    dropout_cache = None
+    if drpout:
+        dropout_cache = dropout(A)
+        print(len(dropout_cache))
+        A = dropout_cache[0]
 
-    cache = (linear_cache, activation_cache)
+    #A, dropout_cache = dropout(A) if drpout == True else A, None
+    print(A)
+    print(f"A {A.shape}")
+    cache = (linear_cache, activation_cache, dropout_cache)
     return A, cache
 
 
 # Forward Propagation
-def forward_propagation(parameters, X):
+def forward_propagation(parameters, X, dropout_size):
 
     caches = []
     L = len(parameters) // 2
 
     inp = X.copy()
     for l in range(1, L):
-        inp, cache = neuron(parameters["W"+str(l)], inp, parameters["b"+str(l)])
+        inp, cache = neuron(parameters["W"+str(l)], inp, parameters["b"+str(l)], drpout=dropout_size[l-1])
         caches.append(cache)
-    op, cache = neuron(parameters["W"+str(L)], inp, parameters["b"+str(L)], "sigmoid")
+    op, cache = neuron(parameters["W"+str(L)], inp, parameters["b"+str(L)], "sigmoid", drpout=dropout_size[L-1])
     caches.append(cache)
     return op, caches
 
@@ -146,7 +164,7 @@ def activation_backward(dA, cache):
     return dZ
 
 def activation_linear_backward(dA, cache, lambd=0.0):
-    linear_cache, activation_cache = cache
+    linear_cache, activation_cache, dropout_cache = cache
     dZ = activation_backward(dA, activation_cache)
     dW, db, dX = linear_backward(dZ, linear_cache, lambd)
 
@@ -178,10 +196,10 @@ def update_parameters(parameters, grads, learning_rate=0.01, optimize="GD"):
     return parameters
 
 # Train mode
-def train(X, Y, layer_dims, learning_rate=0.01, epochs=3, lambd=0.0):
+def train(X, Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.0):
     parameters = initialize_parameters(layer_dims)
     for i in range(0, epochs):
-        preds, caches = forward_propagation(parameters, X)
+        preds, caches = forward_propagation(parameters, X, dropout_size)
         cost = compute_cost(Y, preds, parameters)
         grads = backward_propagation(Y, preds, caches, lambd)
     #    print(grads)
