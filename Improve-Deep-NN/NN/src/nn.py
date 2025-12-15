@@ -173,7 +173,7 @@ def activation_linear_backward(dA, cache, lambd=0.0):
 # Backward Propagation
 def backward_propagation(Y, yh, caches, lambd=0.0):
     epsilon = 0.000001
-    dA = -np.divide(Y, yh) + np.divide((1-Y), (1-yh))
+    dA = -np.divide(Y, yh+epsilon) + np.divide((1-Y), (1-yh+epsilon))
     
     grads = {}
     L = len(caches)
@@ -209,7 +209,8 @@ def train(X, Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.
     return parameters
 
 def predict(parameters, X):
-    logits, _ = forward_propagation(parameters, X)
+    dropout_size = np.zeros(len(parameters) // 2)
+    logits, _ = forward_propagation(parameters, X, dropout_size)
     logits[logits > 0.5] = 1
     logits[logits <= 0.5] = 0
     return logits
