@@ -28,7 +28,8 @@ print("nx", nx)
     # Define network
 layer_dims = [nx, 10, 5, 1]
 
-dropout_size = [0,1,0] if dropout else np.zeros(len(layer_dims)-1)
+dropout_size = [0,1,0] if args.dropout==True else np.zeros(len(layer_dims)-1)
+print(f"drpo size: {dropout_size}")
 parameters = train(X, Y, layer_dims, learning_rate=args.lr, epochs=args.epochs, lambd=args.lambd, dropout_size=dropout_size)
 preds = predict(parameters, X)
 

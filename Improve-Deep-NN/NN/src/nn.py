@@ -49,7 +49,7 @@ def initialize_parameters(layer_dims):
 # Linear quation
 
 def linear(W, X, b):
-    print(f"W {W.shape}, X {X.shape}")
+    #print(f"W {W.shape}, X {X.shape}")
     Z = np.dot(W,X) + b
     cache = (W, X)
     return Z, cache
@@ -71,7 +71,7 @@ def dropout(A, keep_prob=0.5):
     A = A*D
     A = A/keep_prob
     cache = (D, keep_prob)
-    print(A.shape)
+    #print(A.shape)
     return A, cache
 
 def neuron(W, X, b, a_name="relu", drpout=False, keep_prob=0.5):
@@ -79,13 +79,13 @@ def neuron(W, X, b, a_name="relu", drpout=False, keep_prob=0.5):
     A, activation_cache = activation(Z, a_name)
     dropout_cache = None
     if drpout:
-        dropout_cache = dropout(A)
-        print(len(dropout_cache))
-        A = dropout_cache[0]
+        A, dropout_cache = dropout(A)
+        #print(len(dropout_cache))
+       # A = dropout_cache[0]
 
     #A, dropout_cache = dropout(A) if drpout == True else A, None
-    print(A)
-    print(f"A {A.shape}")
+    #print(A)
+    #print(f"A {A.shape}")
     cache = (linear_cache, activation_cache, dropout_cache)
     return A, cache
 
@@ -163,8 +163,20 @@ def activation_backward(dA, cache):
 
     return dZ
 
+# dropout backward
+def dropout_backward(dA, D, keep_prob):
+    dA = dA*D
+    #print(f"dA {dA}, D {D} keep Prob {keep_prob}")
+    dA = dA/keep_prob
+
+    return dA
+
+
 def activation_linear_backward(dA, cache, lambd=0.0):
     linear_cache, activation_cache, dropout_cache = cache
+    
+    if dropout_cache is not None:
+        dA = dropout_backward(dA, dropout_cache[0], dropout_cache[1])
     dZ = activation_backward(dA, activation_cache)
     dW, db, dX = linear_backward(dZ, linear_cache, lambd)
 
