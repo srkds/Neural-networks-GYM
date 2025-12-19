@@ -65,6 +65,21 @@ def activation(Z, a_name="relu"):
     cache = (Z, A, a_name)
     return A, cache
 
+def Softmax(Z):
+    """Softmax activation function
+
+    Z : of shape (C, 1) where C is no of classes
+
+    returns
+    ----------
+    A
+    """
+
+    t = np.exp(Z)
+    t_sum = np.sum(t, axis=0, keepdims=True)
+    A = t / t_sum
+    return A
+
 def dropout(A, keep_prob=0.5):
     D = np.random.rand(A.shape[0], A.shape[1])
     D = (D < keep_prob).astype(int)

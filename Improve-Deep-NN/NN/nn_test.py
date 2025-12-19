@@ -20,3 +20,15 @@ def test_l2_regularization_cost():
     assert l2_cost == cost
 
 
+def test_softmax():
+
+    z = np.array([5,2,-1,3])
+    z = z.reshape(-1, 1)
+    a = Softmax(z)
+    print(a) 
+    assert a.all() == np.array([[0.84203357],[0.04192238],[0.00208719],[0.11395685]]).all()
+    
+    a_sum = np.sum(a)
+
+    assert a_sum == 1.0, "Sum is not 1"
+
