@@ -137,6 +137,8 @@ def L2(parameters, m, lambd=0.0):
     L2_cost *= (lambd/(2*m)) 
 
     return L2_cost 
+
+
 #Compute Cost
 def compute_cost(Y, yh, parameters, c_name='BCE', lambd=0.0):
     #print(Y.shape)
@@ -154,6 +156,12 @@ def compute_cost(Y, yh, parameters, c_name='BCE', lambd=0.0):
         cost = bce_cost + L2_cost
     return cost
 
+
+# Loss entropy
+def CE(s, y):
+    """Cross entropy loss function for softmax"""
+    out = np.sum(np.multiply(y, np.log(s)), axis=0)
+    return out
 
 # linear backward
 def linear_backward(dZ, cache, lambd=0.0):

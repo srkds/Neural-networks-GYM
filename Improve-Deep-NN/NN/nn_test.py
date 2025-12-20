@@ -32,3 +32,17 @@ def test_softmax():
 
     assert a_sum == 1.0, "Sum is not 1"
 
+def test_CE():
+    z = np.array([5,2,-1,3])
+    z = z.reshape(-1, 1)
+    a = Softmax(z)
+    print("Softmax : ",a)
+    y = [[0],[0],[1],[0]]
+    loss = CE(a, y)
+    print("loss: ", loss)
+    #assert a.all() == np.array([[0.84203357],[0.04192238],[0.00208719],[0.11395685]]).all()
+    
+    #a_sum = np.sum(a)
+
+
+
