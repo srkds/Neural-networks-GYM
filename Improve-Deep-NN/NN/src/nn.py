@@ -160,7 +160,8 @@ def compute_cost(Y, yh, parameters, c_name='BCE', lambd=0.0):
 # Loss entropy
 def CE(s, y):
     """Cross entropy loss function for softmax"""
-    out = np.sum(np.multiply(y, np.log(s)), axis=0)
+    m = y.shape[1] # no of training examples
+    out = np.sum(np.sum(np.multiply(y, np.log(s)), axis=0)) / m
     return out
 
 # linear backward
