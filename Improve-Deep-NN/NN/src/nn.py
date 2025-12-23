@@ -62,6 +62,9 @@ def activation(Z, a_name="relu"):
     if a_name == 'sigmoid':
         A = 1 / (1 + np.exp(-Z))
 
+    if a_name == 'softmax':
+        A = Softmax(Z)
+
     cache = (Z, A, a_name)
     return A, cache
 
@@ -74,8 +77,9 @@ def Softmax(Z):
     ----------
     A
     """
-
-    t = np.exp(Z)
+   # print("Z.shape: ", Z.shape)
+    Z_shifted = Z - np.max(Z, axis=0, keepdims=True)    
+    t = np.exp(Z_shifted)
     t_sum = np.sum(t, axis=0, keepdims=True)
     A = t / t_sum
     return A
@@ -106,7 +110,7 @@ def neuron(W, X, b, a_name="relu", drpout=False, keep_prob=0.5):
 
 
 # Forward Propagation
-def forward_propagation(parameters, X, dropout_size):
+def forward_propagation(parameters, X, dropout_size, multiclass=False):
 
     caches = []
     L = len(parameters) // 2
@@ -115,7 +119,11 @@ def forward_propagation(parameters, X, dropout_size):
     for l in range(1, L):
         inp, cache = neuron(parameters["W"+str(l)], inp, parameters["b"+str(l)], drpout=dropout_size[l-1])
         caches.append(cache)
-    op, cache = neuron(parameters["W"+str(L)], inp, parameters["b"+str(L)], "sigmoid", drpout=dropout_size[L-1])
+
+    activation = "sigmoid"    
+    if multiclass==True:
+        activation = "softmax"
+    op, cache = neuron(parameters["W"+str(L)], inp, parameters["b"+str(L)], activation, drpout=dropout_size[L-1])
     caches.append(cache)
     return op, caches
 
@@ -154,14 +162,22 @@ def compute_cost(Y, yh, parameters, c_name='BCE', lambd=0.0):
         bce_cost = BCE(Y, yh)
         L2_cost = L2(parameters,m, lambd)
         cost = bce_cost + L2_cost
+
+    if c_name=="CE":
+        cost = CE(yh, Y)
+        
     return cost
 
 
-# Loss entropy
+# Loss cross entropy
 def CE(s, y):
     """Cross entropy loss function for softmax"""
     m = y.shape[1] # no of training examples
-    out = np.sum(np.sum(np.multiply(y, np.log(s)), axis=0)) / m
+    #print("m: ", m)
+    #print(s)
+    eps = 1e-12
+    s = np.clip(s, eps, 1-eps) 
+    out = -np.sum(np.sum(np.multiply(y, np.log(s)), axis=0)) / m
     return out
 
 # linear backward
@@ -209,16 +225,33 @@ def activation_linear_backward(dA, cache, lambd=0.0):
 # Backward Propagation
 def backward_propagation(Y, yh, caches, lambd=0.0):
     epsilon = 0.000001
-    dA = -np.divide(Y, yh+epsilon) + np.divide((1-Y), (1-yh+epsilon))
-    
+    dA = None 
     grads = {}
     L = len(caches)
-    for l in reversed(range(1, L+1)):
+
+    linear_cache, activation_cache, dropout_cache = caches[-1]
+    if Y.shape[0] > 1:
+        dZ = yh - Y
+        dW, db, dX = linear_backward(dZ, linear_cache, lambd)
+        grads["dW"+str(L)] = dW
+        grads["db"+str(L)] = db
+        dA = dX
+    else:
+        dA = -np.divide(Y, yh+epsilon) + np.divide((1-Y), (1-yh+epsilon))
+        dZ = activation_backward(dA, activation_cache)
+        dW, db, dX = linear_backward(dZ, linear_cache, lambd)
+        
+        grads["dW"+str(L)] = dW
+        grads["db"+str(L)] = db
+        dA = dX
+
+    for l in reversed(range(1, L)):
         dW, db, dA = activation_linear_backward(dA, caches[l-1], lambd)
         grads["dW"+str(l)] = dW
         grads["db"+str(l)] = db
     return grads
         
+#def backward_CE(Y, yh, caches, lambd=0.0):
 
 # Update Parameters
 def update_parameters(parameters, grads, learning_rate=0.01, optimize="GD"):
@@ -232,11 +265,14 @@ def update_parameters(parameters, grads, learning_rate=0.01, optimize="GD"):
     return parameters
 
 # Train mode
-def train(X, Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.0):
+def train(X, Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.0, multiclass=False):
     parameters = initialize_parameters(layer_dims)
+    c_name = "CE" if multiclass==True else "BCE"
     for i in range(0, epochs):
-        preds, caches = forward_propagation(parameters, X, dropout_size)
-        cost = compute_cost(Y, preds, parameters)
+        preds, caches = forward_propagation(parameters, X, dropout_size, multiclass)
+        cost = compute_cost(Y, preds, parameters, c_name)
+        #print(cost)
+        #print(preds.shape)
         grads = backward_propagation(Y, preds, caches, lambd)
     #    print(grads)
         parameters = update_parameters(parameters, grads, learning_rate)
@@ -244,11 +280,16 @@ def train(X, Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.
             print(cost)
     return parameters
 
-def predict(parameters, X):
+def predict(parameters, X, multiclass=False):
     dropout_size = np.zeros(len(parameters) // 2)
-    logits, _ = forward_propagation(parameters, X, dropout_size)
-    logits[logits > 0.5] = 1
-    logits[logits <= 0.5] = 0
+    logits, _ = forward_propagation(parameters, X, dropout_size, multiclass)
+    
+    if multiclass==True:
+        #print(logits)
+        logits = logits.argmax(axis=0)
+    else:
+        logits[logits > 0.5] = 1
+        logits[logits <= 0.5] = 0
     return logits
 
 if __name__ == "__main__":
