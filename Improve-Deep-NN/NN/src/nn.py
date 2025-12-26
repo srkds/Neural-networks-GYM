@@ -84,7 +84,7 @@ def Softmax(Z):
     A = t / t_sum
     return A
 
-def dropout(A, keep_prob=0.5):
+def dropout(A, keep_prob=0.8):
     D = np.random.rand(A.shape[0], A.shape[1])
     D = (D < keep_prob).astype(int)
     A = A*D
@@ -265,20 +265,30 @@ def update_parameters(parameters, grads, learning_rate=0.01, optimize="GD"):
     return parameters
 
 # Train mode
-def train(X, Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.0, multiclass=False):
+def train(X, Y, test_X, test_Y, layer_dims, dropout_size, learning_rate=0.01, epochs=3, lambd=0.0, multiclass=False):
+    meta_data = {"train_cost":[], "test_cost":[]}
     parameters = initialize_parameters(layer_dims)
     c_name = "CE" if multiclass==True else "BCE"
     for i in range(0, epochs):
         preds, caches = forward_propagation(parameters, X, dropout_size, multiclass)
         cost = compute_cost(Y, preds, parameters, c_name)
+        test_cost = test(test_X, test_Y, parameters, dropout_size, c_name, True)
+        meta_data["train_cost"].append(cost.item())
+        meta_data["test_cost"].append(test_cost.item())
         #print(cost)
         #print(preds.shape)
         grads = backward_propagation(Y, preds, caches, lambd)
     #    print(grads)
         parameters = update_parameters(parameters, grads, learning_rate)
-        if (i % 100 == 0):
-            print(cost)
-    return parameters
+        if (i % 5 == 0):
+            print("Iteration: ", i, " Loss: ", cost)
+    return parameters, meta_data
+
+
+def test(test_X, test_Y, parameters, dropout_size, c_name="BCE", multiclass=False):
+    preds, _ = forward_propagation(parameters, test_X, dropout_size, multiclass)
+    cost = compute_cost(test_Y, preds, parameters, c_name)
+    return cost
 
 def predict(parameters, X, multiclass=False):
     dropout_size = np.zeros(len(parameters) // 2)
@@ -286,11 +296,11 @@ def predict(parameters, X, multiclass=False):
     
     if multiclass==True:
         #print(logits)
-        logits = logits.argmax(axis=0)
+       classes = logits.argmax(axis=0) # (C,M) -> (1,M)
     else:
         logits[logits > 0.5] = 1
         logits[logits <= 0.5] = 0
-    return logits
+    return classes, logits
 
 if __name__ == "__main__":
     print("Comes here..")

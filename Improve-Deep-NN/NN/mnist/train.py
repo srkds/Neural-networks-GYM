@@ -1,5 +1,6 @@
 from mlxtend.data import loadlocal_mnist
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import numpy as np
 
 import argparse
@@ -30,6 +31,7 @@ images = images.reshape(-1, 28, 28)
 
 plt.imshow(images[2])
 plt.show()
+
 print(labels[2])
 classes = 10
 y = np.eye(classes)[labels] # -1, 10
@@ -47,8 +49,43 @@ layer_dims = [nx, 128, 64, c]
 
 dropout_size = [0,1,0] if args.dropout==True else np.zeros(len(layer_dims)-1)
 
-parameters = train(X[:,:2000], Y[:,:2000], layer_dims, learning_rate=args.lr, epochs=args.epochs, lambd=args.lambd, dropout_size=dropout_size, multiclass=True)
-preds = predict(parameters, X[:, 10:20], True)
+parameters, mdata = train(X[:,:4000], Y[:,:4000], X[:,4000:4200], Y[:,4000:4200], layer_dims, learning_rate=args.lr, epochs=args.epochs, lambd=args.lambd, dropout_size=dropout_size, multiclass=True)
+preds, logits = predict(parameters, X[:, 4000:4020], True)
 
-print("Actual:", Y[:,10:20].argmax(axis=0))
+#print(f"train loss: {mdata['train_cost']} \n test loss: {mdata['test_cost']}")
+
+plt.plot(range(args.epochs), mdata["train_cost"], label="train_loss")
+plt.plot(range(args.epochs), mdata["test_cost"], label="test_loss")
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.legend()
+
+print(f"Train Loss: {mdata['train_cost'][-1]}, Test Loss: {mdata['test_cost'][-1]}")
+print("Actual:", Y[:,4000:4020].argmax(axis=0))
 print("predicted: ", preds)
+
+nc = 4
+
+fig, axes = plt.subplots(nrows=2, ncols=nc, figsize=(6,3))
+
+for i, ax in enumerate(axes.flat):
+    
+    # image show
+    ax.imshow(images[4000+i])
+    
+    bar_ax = inset_axes(ax, width="100%", height="30%", loc="lower center", bbox_to_anchor=(0, -0.40, 1, 1), bbox_transform=ax.transAxes, borderpad=0)
+
+    #probs = np.random.rand(10,)
+    probs = logits[:,i].reshape(-1,)
+    bar_ax.bar(range(10), probs)
+
+    bar_ax.set_ylim(0,1)
+    bar_ax.set_xticks(range(10)),
+    #bar_ax.xticklabels(range(10), fontsize=6)
+    
+
+    ax.bar([1,2], [1,2])
+    #ax.text(0.5, -0.15, f'TL: {str(Y_test[0][i])}, MP: {preds[0][i]}', transform=ax.transAxes, ha='center', va='bottom')
+    ax.axis('off')
+plt.show()
+
