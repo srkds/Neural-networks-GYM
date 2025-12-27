@@ -6,7 +6,7 @@ Train handwritten digit classification on feed forward neural network. What you 
 python train.py --lr= --epochs= --dropout= --lambd=
 ```
 
+Without dropout with following settings `python train.py --lr=0.001 --epochs=300` you can get following results
 
-
-
+<img src="./../../../assets/wo_dropout.jpg" />
 
