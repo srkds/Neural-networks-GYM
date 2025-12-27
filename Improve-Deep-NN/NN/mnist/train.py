@@ -77,6 +77,7 @@ if __name__ == "__main__":
 
     X = images.reshape(-1, 28*28).T # nx, m
     Y = y # c, m
+    X = X/255
 
     nx =  X.shape[0] # no of features
     c = y.shape[0] # classes
