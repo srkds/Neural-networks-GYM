@@ -8,3 +8,9 @@ name = "nn"
 version = "0.1.0"
 description = "Neural network implementations"
 requires-python = ">=3.8"
+
+dependencies = [
+"mlxtend",
+"numpy",
+"matplotlib"
+]

@@ -1,4 +1,20 @@
-# MNIST Iraining
+# MNIST Training
+
+
+### Quick start
+
+From `NN` directory run following command to install dependencies
+```
+pip install -e .
+```
+
+Then come back to `mnist` directory and run
+
+```
+python train.py --lr=0.01 --epochs=400
+```
+
+### Experiment
 
 Train handwritten digit classification on feed forward neural network. What you can expect from running this script, you can see all the clear blocks or implementations of neuron(linear equation, activation), Dropout, softmax, loss function (BCE, CE)
 
