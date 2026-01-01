@@ -165,6 +165,8 @@ def compute_cost(Y, yh, parameters, c_name='BCE', lambd=0.0):
 
     if c_name=="CE":
         cost = CE(yh, Y)
+        L2_cost = L2(parameters,m, lambd)
+        cost = cost + L2_cost
         
     return cost
 
@@ -271,7 +273,7 @@ def train(X, Y, test_X, test_Y, layer_dims, dropout_size, learning_rate=0.01, ep
     c_name = "CE" if multiclass==True else "BCE"
     for i in range(0, epochs):
         preds, caches = forward_propagation(parameters, X, dropout_size, multiclass)
-        cost = compute_cost(Y, preds, parameters, c_name)
+        cost = compute_cost(Y, preds, parameters, c_name, lambd)
         test_cost = test(test_X, test_Y, parameters, dropout_size, c_name, True)
         meta_data["train_cost"].append(cost.item())
         meta_data["test_cost"].append(test_cost.item())
