@@ -2,7 +2,7 @@
 ### Implementations
  
 - [Feed forward Neural Network from scratch](https://github.com/srkds/Neural-networks-GYM/blob/main/Improve-Deep-NN/NN/src/nn.py), that includes forward pass, backwardpass, Activation Functions(ReLU, Sigmoid, Softmax), Loss functions(binary cross entropy, cross entropy), and regularizations like Dropout, and L2.
-- Try your self training any multiclass classification task, start with [training MNIST hand written digit classification](https://github.com/srkds/Neural-networks-GYM/tree/main/Improve-Deep-NN/NN/mnisti)
+- Try your self training any multiclass classification task, start with [training MNIST hand written digit classification](https://github.com/srkds/Neural-networks-GYM/tree/main/Improve-Deep-NN/NN/mnist)
 
 ### Papers
 
