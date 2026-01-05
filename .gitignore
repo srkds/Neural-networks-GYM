@@ -1,0 +1,11 @@
+__pycache__/
+
+.DS_Store
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# OS-specific files
+.DS_Store
+*.swp
