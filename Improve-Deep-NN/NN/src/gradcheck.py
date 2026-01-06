@@ -63,6 +63,9 @@ def grad_check(parameters, gradients, X, Y, epsilon=1e-7):
     parameter_vec, p_keys, p_cols, pel_count = dictionary_to_vector(parameters)
     gradient_vec, g_keys, g_cols, gel_count = dictionary_to_vector(gradients)
 
+    print("grads", gradients)
+    print("grad vector: ", gradient_vec)
+
     num_params = parameter_vec.shape[0]
     J_plus = np.zeros(parameter_vec.shape)
     J_minus = np.zeros(parameter_vec.shape)
@@ -76,14 +79,16 @@ def grad_check(parameters, gradients, X, Y, epsilon=1e-7):
         param_plus[i] = param_plus[i] + epsilon
         param_plus_dict = vector_to_dictionary(param_plus, p_keys, p_cols, pel_count) 
         preds_plus, _ = forward_propagation(param_plus_dict, X, [0,0,0], False)
-        J_plus[i] = preds_plus.item()
+        cost_plus = compute_cost(Y, preds_plus,param_plus_dict)
+        J_plus[i] = cost_plus.item()
         
         # J for theta minus
         param_minus = np.copy(parameter_vec)
         param_minus[i] = param_minus[i] - epsilon
         param_minus_dict = vector_to_dictionary(param_minus, p_keys, p_cols, pel_count)
         preds_minus, _ = forward_propagation(param_minus_dict, X, [0, 0, 0], False)
-        J_minus[i] = preds_minus.item()
+        cost_minus = compute_cost(Y, preds_minus, param_minus_dict)
+        J_minus[i] = cost_minus.item()
 
         print("param_plus: ", param_plus_dict)
         print("param_minus: ", param_minus_dict)
