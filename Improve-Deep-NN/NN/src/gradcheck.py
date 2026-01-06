@@ -53,16 +53,64 @@ def vector_to_dictionary(vector, keys, cols, el_count):
     return parameters_dict
 
 
-def grad_check(parameters, gradients, X, Y):
+def grad_check(parameters, gradients, X, Y, epsilon=1e-7):
 
     """
     for each parameter calculate gradapprox =  J(theta+epsilon) - J(theta-epsilon) / 2epsilon
     then calculate distance between gradapprox and gradients
     """
 
-    pass 
+    parameter_vec, p_keys, p_cols, pel_count = dictionary_to_vector(parameters)
+    gradient_vec, g_keys, g_cols, gel_count = dictionary_to_vector(gradients)
 
+    num_params = parameter_vec.shape[0]
+    J_plus = np.zeros(parameter_vec.shape)
+    J_minus = np.zeros(parameter_vec.shape)
+    grad_approx = np.zeros(parameter_vec.shape)
 
+    for i in range(num_params):
+        print("i:", i)
+        
+        # J For theta plus
+        param_plus = np.copy(parameter_vec)
+        param_plus[i] = param_plus[i] + epsilon
+        param_plus_dict = vector_to_dictionary(param_plus, p_keys, p_cols, pel_count) 
+        preds_plus, _ = forward_propagation(param_plus_dict, X, [0,0,0], False)
+        J_plus[i] = preds_plus.item()
+        
+        # J for theta minus
+        param_minus = np.copy(parameter_vec)
+        param_minus[i] = param_minus[i] - epsilon
+        param_minus_dict = vector_to_dictionary(param_minus, p_keys, p_cols, pel_count)
+        preds_minus, _ = forward_propagation(param_minus_dict, X, [0, 0, 0], False)
+        J_minus[i] = preds_minus.item()
+
+        print("param_plus: ", param_plus_dict)
+        print("param_minus: ", param_minus_dict)
+        print("j+", J_plus[i])
+        print("J-", J_minus[i])
+
+        # grad approx 
+        grad_approx[i] = (J_plus[i] - J_minus[i]) / (2*epsilon) 
+        print("grad_approx ", grad_approx[i])
+        if i == 10:
+            break
+    
+    print(J_plus[:10])
+    print(J_minus[:10])
+
+    numerator = np.linalg.norm(gradient_vec - grad_approx)
+    denominator = np.linalg.norm(gradient_vec) + np.linalg.norm(grad_approx)
+    difference = numerator/denominator
+
+    print(gradient_vec[:5])
+    print(grad_approx[:5])
+
+    if difference > 2e-7:
+        print("Mistake in backwardpass, the difference is ", str(difference))
+    else:
+        print("Backwardpass works perfectly fine!, ", str(difference))
+    
 
     
 if __name__ == "__main__":
@@ -86,6 +134,8 @@ if __name__ == "__main__":
     print(el_count)
     param = vector_to_dictionary(vec, keys, cols, el_count)
     print(param)
-    #preds, caches = forward_propagation(parameters, X, dropout_size, False)
-    #grads = backward_propagation(Y, preds, caches, lambd=0.0)
+    preds, caches = forward_propagation(parameters, X, dropout_size, False)
+    grads = backward_propagation(Y, preds, caches, lambd=0.0)
+
+    grad_check(parameters, grads, X, Y)
     
