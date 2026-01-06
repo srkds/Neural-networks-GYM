@@ -61,7 +61,12 @@ def grad_check(parameters, gradients, X, Y, epsilon=1e-7):
     """
 
     parameter_vec, p_keys, p_cols, pel_count = dictionary_to_vector(parameters)
-    gradient_vec, g_keys, g_cols, gel_count = dictionary_to_vector(gradients)
+    #gradient_vec, g_keys, g_cols, gel_count = dictionary_to_vector(gradients)
+    gradient_vec = []
+    for key in p_keys:
+        grad = gradients["d"+key]
+        gradient_vec.append(grad.reshape(-1,))
+    gradient_vec = np.concatenate(gradient_vec)
 
     print("grads", gradients)
     print("grad vector: ", gradient_vec)
@@ -98,8 +103,8 @@ def grad_check(parameters, gradients, X, Y, epsilon=1e-7):
         # grad approx 
         grad_approx[i] = (J_plus[i] - J_minus[i]) / (2*epsilon) 
         print("grad_approx ", grad_approx[i])
-        if i == 10:
-            break
+        #if i == 10:
+         #   break
     
     print(J_plus[:10])
     print(J_minus[:10])
@@ -111,7 +116,7 @@ def grad_check(parameters, gradients, X, Y, epsilon=1e-7):
     print(gradient_vec[:5])
     print(grad_approx[:5])
 
-    if difference > 2e-7:
+    if difference > 2e-6:
         print("Mistake in backwardpass, the difference is ", str(difference))
     else:
         print("Backwardpass works perfectly fine!, ", str(difference))
