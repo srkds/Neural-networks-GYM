@@ -36,6 +36,7 @@ def initialize_parameters(layer_dims):
         "b1": ,
         ...
     }
+
     """
     parameters = {}
     L = len(layer_dims)
@@ -49,6 +50,27 @@ def initialize_parameters(layer_dims):
 # Linear quation
 
 def linear(W, X, b):
+    """
+    This function will apply linear equation
+    
+    .. math:: 
+        Z = W . X + b
+
+    Args:
+        W: weight matrix of layer ``l``
+
+        X: input or output of previous layer of neural net X or A[l-1]
+
+        b: bias vector for all the nodes
+
+    Examples::
+        >>> W = np.array([[.5, .8],[1, .4]])
+        >>> b = np.ones((2,1))
+        >>> X = np.array([[1],[2]])
+        >>> Z = linear(W, X, b)
+        >>> Z.shape
+        (2,1)
+    """
     #print(f"W {W.shape}, X {X.shape}")
     Z = np.dot(W,X) + b
     cache = (W, X)
@@ -56,6 +78,22 @@ def linear(W, X, b):
 
 # Activation Function
 def activation(Z, a_name="relu"):
+    """
+    This function will apply activation on given input. It supports ``ReLU``, ``Sigmoid`` and ``Softmax``.
+
+    Args:
+        Z: output matrix of linear function.
+        a_name: activation name that you want to apply
+
+    - Relu
+
+    .. math::
+        Z = W.X + b
+
+        A = g(Z)
+
+    Here matrix ``Z`` is output of linear function and is input for activation function ``g()``. 
+    """
     A = None
     if a_name == 'relu':
         A = np.maximum(0, Z) 
@@ -184,6 +222,34 @@ def CE(s, y):
 
 # linear backward
 def linear_backward(dZ, cache, lambd=0.0):
+    """
+    This function will compute backward pass for linear layer, meaning calculating gradients of W, X, and b with respect to Z and multiplying it with derivative of Z for chain rule.
+    
+    derivative of ``W`` will be its corresponding value in X. for example if c = a*b then der of a is b. then we multiply it with der of Z to apply the chain rule. And following is vectorized version.
+
+    .. math::
+        dW = \\frac{1}{m}.dZ.X^T + \\frac{\\lambda}{m}*W
+
+    Now derivative of sum 1 so local gradient will be 1 so what ever the gradient of dZ, will be passed to derivative of ``b``. if the we have only 1 training semple then the shape of dZ will be (l,1) and if there are m training examples then (l, m). for second we need to sum all the dz for first node that is first row, and same for all that's why in implementation you will see the sum on axis 1
+
+    .. math::
+        db = \\frac{1}{m}.1*dZ
+
+    And now you calculate derivative of input that is ``X`` which can be output of previous layer.
+
+    .. math::
+        dX = W^T.dZ
+
+    
+    Args:
+        dZ: Gradient matrix of ``Z``, that you got from activation backward
+
+        cache: tuple of matrix ``(W,X)``
+
+        lambd: L2 regularization penalty value. default is 0.0
+
+
+    """
     W, X = cache
     m = X.shape[1]
     dW = np.dot(dZ, X.T) / m + ((lambd/m)*W)

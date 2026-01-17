@@ -12,5 +12,6 @@ requires-python = ">=3.8"
 dependencies = [
 "mlxtend",
 "numpy",
-"matplotlib"
+"matplotlib",
+"sphinx"
 ]
