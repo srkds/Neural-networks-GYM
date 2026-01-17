@@ -23,6 +23,10 @@ NN_SRC = os.path.join(
     "src",
 )
 
+
+import nn
+print("SPHINX nn IMPORTED FROM:", nn.__file__)
+
 project = 'Deep Learning From Scratch'
 copyright = '2026, Nirav'
 author = 'Nirav'
