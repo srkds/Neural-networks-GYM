@@ -9,7 +9,19 @@
 import pathlib
 import sys
 import os
-sys.path.insert(0, os.path.abspath('../../Improve-Deep-NN/NN/src'))
+#sys.path.insert(0, os.path.abspath('../../Improve-Deep-NN/NN/src'))
+
+
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..")
+)
+
+NN_SRC = os.path.join(
+    PROJECT_ROOT,
+    "Improve-Deep-NN",
+    "NN",
+    "src",
+)
 
 project = 'Deep Learning From Scratch'
 copyright = '2026, Nirav'
