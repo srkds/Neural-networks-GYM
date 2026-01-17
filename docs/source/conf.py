@@ -56,3 +56,8 @@ html_static_path = ['_static']
 html_baseurl = "https://USERNAME.github.io/REPO/"
 
 extensions += ["sphinx.ext.githubpages"]
+
+# moch the import, there is no real need to import numpy 
+autodoc_mock_imports = [
+    "numpy",
+]
