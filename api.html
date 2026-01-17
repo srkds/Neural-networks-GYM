@@ -12,6 +12,7 @@
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="canonical" href="https://USERNAME.github.io/REPO/api.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,10 +37,85 @@
   <section id="api-documentation">
 <h1>API Documentation<a class="headerlink" href="#api-documentation" title="Link to this heading">¶</a></h1>
 <p>When you design a neural network each layer consists of no of nurons and single nuron is made up of <code class="docutils literal notranslate"><span class="pre">linear-&gt;activation</span></code> functions. Following functions are atomic independent functions to create a neural net.</p>
-<ol class="arabic simple">
-<li><p>Linear Layer</p></li>
-<li><p>Linear Backward</p></li>
-<li><p>Activation</p></li>
+<ol class="arabic">
+<li><p>Linear Layer</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="nn.linear">
+<span class="sig-prename descclassname"><span class="pre">nn.</span></span><span class="sig-name descname"><span class="pre">linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">W</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nn.linear" title="Link to this definition">¶</a></dt>
+<dd><p>This function will apply linear equation</p>
+<div class="math notranslate nohighlight">
+\[Z = W . X + b\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>W</strong> – weight matrix of layer <code class="docutils literal notranslate"><span class="pre">l</span></code></p></li>
+<li><p><strong>X</strong> – input or output of previous layer of neural net X or A[l-1]</p></li>
+<li><p><strong>b</strong> – bias vector for all the nodes</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Examples::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.8</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">.4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Z</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Z</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2,1)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</li>
+<li><p>Linear Backward</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="nn.linear_backward">
+<span class="sig-prename descclassname"><span class="pre">nn.</span></span><span class="sig-name descname"><span class="pre">linear_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dZ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nn.linear_backward" title="Link to this definition">¶</a></dt>
+<dd><p>This function will compute backward pass for linear layer, meaning calculating gradients of W, X, and b with respect to Z and multiplying it with derivative of Z for chain rule.</p>
+<p>derivative of <code class="docutils literal notranslate"><span class="pre">W</span></code> will be its corresponding value in X. for example if c = a*b then der of a is b. then we multiply it with der of Z to apply the chain rule. And following is vectorized version.</p>
+<div class="math notranslate nohighlight">
+\[dW = \frac{1}{m}.dZ.X^T + \frac{\lambda}{m}*W\]</div>
+<p>Now derivative of sum 1 so local gradient will be 1 so what ever the gradient of dZ, will be passed to derivative of <code class="docutils literal notranslate"><span class="pre">b</span></code>. if the we have only 1 training semple then the shape of dZ will be (l,1) and if there are m training examples then (l, m). for second we need to sum all the dz for first node that is first row, and same for all that’s why in implementation you will see the sum on axis 1</p>
+<div class="math notranslate nohighlight">
+\[db = \frac{1}{m}.1*dZ\]</div>
+<p>And now you calculate derivative of input that is <code class="docutils literal notranslate"><span class="pre">X</span></code> which can be output of previous layer.</p>
+<div class="math notranslate nohighlight">
+\[dX = W^T.dZ\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dZ</strong> – Gradient matrix of <code class="docutils literal notranslate"><span class="pre">Z</span></code>, that you got from activation backward</p></li>
+<li><p><strong>cache</strong> – tuple of matrix <code class="docutils literal notranslate"><span class="pre">(W,X)</span></code></p></li>
+<li><p><strong>lambd</strong> – L2 regularization penalty value. default is 0.0</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</li>
+<li><p>Activation</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="nn.activation">
+<span class="sig-prename descclassname"><span class="pre">nn.</span></span><span class="sig-name descname"><span class="pre">activation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nn.activation" title="Link to this definition">¶</a></dt>
+<dd><p>This function will apply activation on given input. It supports <code class="docutils literal notranslate"><span class="pre">ReLU</span></code>, <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code> and <code class="docutils literal notranslate"><span class="pre">Softmax</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> – output matrix of linear function.</p></li>
+<li><p><strong>a_name</strong> – activation name that you want to apply</p></li>
+</ul>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>Relu</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}Z = W.X + b\\A = g(Z)\end{aligned}\end{align} \]</div>
+<p>Here matrix <code class="docutils literal notranslate"><span class="pre">Z</span></code> is output of linear function and is input for activation function <code class="docutils literal notranslate"><span class="pre">g()</span></code>.</p>
+</dd></dl>
+
+</li>
 </ol>
 </section>
 
@@ -71,7 +147,12 @@
 <script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nn.linear"><code class="docutils literal notranslate"><span class="pre">linear()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nn.linear_backward"><code class="docutils literal notranslate"><span class="pre">linear_backward()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nn.activation"><code class="docutils literal notranslate"><span class="pre">activation()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
