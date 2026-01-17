@@ -23,7 +23,7 @@ NN_SRC = os.path.join(
     "src",
 )
 
-
+sys.path.insert(0, NN_SRC)
 import nn
 print("SPHINX nn IMPORTED FROM:", nn.__file__)
 
