@@ -16,6 +16,7 @@
     <link rel="canonical" href="https://USERNAME.github.io/REPO/api.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Regularization" href="regularization.html" />
     <link rel="prev" title="Deep Learning From Scratch documentation" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -113,6 +114,64 @@
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}Z = W.X + b\\A = g(Z)\end{aligned}\end{align} \]</div>
 <p>Here matrix <code class="docutils literal notranslate"><span class="pre">Z</span></code> is output of linear function and is input for activation function <code class="docutils literal notranslate"><span class="pre">g()</span></code>.</p>
+<ul class="simple">
+<li><p>ReLU</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[A = max(0,Z)\]</div>
+<ul class="simple">
+<li><p>Sigmoid</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[A = \frac{1}{1+e^{-Z}}\]</div>
+</dd></dl>
+
+</li>
+<li><p>Softmax Activation</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="nn.Softmax">
+<span class="sig-prename descclassname"><span class="pre">nn.</span></span><span class="sig-name descname"><span class="pre">Softmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nn.Softmax" title="Link to this definition">¶</a></dt>
+<dd><p>Softmax activation function</p>
+<p>Z : of shape (C, 1) where C is no of classes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A of shape (C, 1) but the values will be probability and its sum will be 1</p>
+</dd>
+</dl>
+<p>Let say <span class="math notranslate nohighlight">\(Z\)</span> is matrix of shape <span class="math notranslate nohighlight">\((C, m)\)</span> where <code class="docutils literal notranslate"><span class="pre">C</span></code> is no of classes and <code class="docutils literal notranslate"><span class="pre">m</span></code> is no of training samples. And <span class="math notranslate nohighlight">\(z\)</span> is a vector of values <span class="math notranslate nohighlight">\([z_1, z_2,...z_c]\)</span> then the softmax output of vector <code class="docutils literal notranslate"><span class="pre">z</span></code> is following equation.</p>
+<div class="math notranslate nohighlight">
+\[A(z_i) = \frac{e^{z_i}}{\sum_{i=1}^{C}e^{z_i}}\]</div>
+</dd></dl>
+
+</li>
+<li><p>Neuron / Layerl</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="nn.neuron">
+<span class="sig-prename descclassname"><span class="pre">nn.</span></span><span class="sig-name descname"><span class="pre">neuron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">W</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drpout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nn.neuron" title="Link to this definition">¶</a></dt>
+<dd><p>This function can work as a single neuron or a single layer which computes linear-&gt;activation function with the help of previously defined atomic function. This takes weight &amp; bias metrix, output of previous layer or input in case of first layer, activation, dropout, and keep_prob. You can directly use this function as a layer where you give input and you get output.</p>
+</dd></dl>
+
+</li>
+<li><p>Initialize Neural Network Parameters</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="nn.initialize_parameters">
+<span class="sig-prename descclassname"><span class="pre">nn.</span></span><span class="sig-name descname"><span class="pre">initialize_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_dims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nn.initialize_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>Takes
+layer_dims : eg [nx, layer_1, 2, 3]</p>
+<p>Let <span class="math notranslate nohighlight">\(L\)</span> be a no of layers and <span class="math notranslate nohighlight">\(\text{layer_dims} = [n_0, n_1, ..., n_L]\)</span> where <span class="math notranslate nohighlight">\(n_l\)</span> denotes no of neurons in <span class="math notranslate nohighlight">\(l^{th}\)</span> layer. then the <span class="math notranslate nohighlight">\(W\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are weight and bias matrix, where <span class="math notranslate nohighlight">\(W^{[l]} \in R^{n_l \times n_{l-1}}\)</span>, <span class="math notranslate nohighlight">\(b^{[l]} \in R^{n_l \times 1}\)</span>.</p>
+<p>And the <span class="math notranslate nohighlight">\(parameters = {W^{[1]}, b^{[1]}, ..., W^{[L]}, b^{[L]}}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>&gt;&gt;&gt; parameters</strong> (<em>dictionary {</em>)</p></li>
+<li><p><strong>&gt;&gt;&gt;    “W1”</strong> (<em>{}, layer 1</em>)</p></li>
+<li><p><strong>&gt;&gt;&gt;    “b1”</strong> (<em>,</em>)</p></li>
+<li><p><em>&gt;&gt;&gt;    …</em></p></li>
+<li><p><em>&gt;&gt;&gt; }</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </li>
@@ -151,8 +210,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#nn.linear"><code class="docutils literal notranslate"><span class="pre">linear()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#nn.linear_backward"><code class="docutils literal notranslate"><span class="pre">linear_backward()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#nn.activation"><code class="docutils literal notranslate"><span class="pre">activation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nn.Softmax"><code class="docutils literal notranslate"><span class="pre">Softmax()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nn.neuron"><code class="docutils literal notranslate"><span class="pre">neuron()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nn.initialize_parameters"><code class="docutils literal notranslate"><span class="pre">initialize_parameters()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="regularization.html">Regularization</a></li>
 </ul>
 
 <div class="relations">
@@ -160,6 +223,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Deep Learning From Scratch documentation</a></li>
+      <li>Next: <a href="regularization.html" title="next chapter">Regularization</a></li>
   </ul></li>
 </ul>
 </div>

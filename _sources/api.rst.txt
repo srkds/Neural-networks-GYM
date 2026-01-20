@@ -15,3 +15,15 @@ When you design a neural network each layer consists of no of nurons and single 
 3. Activation
 
    .. autofunction:: nn.activation
+
+4. Softmax Activation
+
+   .. autofunction:: nn.Softmax
+
+5. Neuron / Layerl
+
+   .. autofunction:: nn.neuron
+
+6. Initialize Neural Network Parameters
+
+   .. autofunction:: nn.initialize_parameters
