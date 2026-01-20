@@ -29,13 +29,17 @@ def initialize_parameters(layer_dims):
     Takes
     layer_dims : eg [nx, layer_1, 2, 3]
 
+    Let :math:`L` be a no of layers and :math:`\\text{layer_dims} = [n_0, n_1, ..., n_L]` where :math:`n_l` denotes no of neurons in :math:`l^{th}` layer. then the :math:`W` and :math:`b` are weight and bias matrix, where :math:`W^{[l]} \in R^{n_l \\times n_{l-1}}`, :math:`b^{[l]} \in R^{n_l \\times 1}`.
+
+    And the :math:`parameters = {W^{[1]}, b^{[1]}, ..., W^{[L]}, b^{[L]}}`
+
     returns
     --------
-    parameters: dictionary {
-        "W1": {}, layer 1
-        "b1": ,
-        ...
-    }
+    >>> parameters: dictionary {
+    >>>    "W1": {}, layer 1
+    >>>    "b1": ,
+    >>>    ...
+    >>> }
 
     """
     parameters = {}
@@ -92,7 +96,17 @@ def activation(Z, a_name="relu"):
 
         A = g(Z)
 
-    Here matrix ``Z`` is output of linear function and is input for activation function ``g()``. 
+    Here matrix ``Z`` is output of linear function and is input for activation function ``g()``.
+
+    - ReLU
+    
+    .. math::
+        A = max(0,Z)
+
+    - Sigmoid
+    
+    .. math::
+        A = \\frac{1}{1+e^{-Z}}
     """
     A = None
     if a_name == 'relu':
@@ -113,7 +127,14 @@ def Softmax(Z):
 
     returns
     ----------
-    A
+    A of shape (C, 1) but the values will be probability and its sum will be 1
+
+
+    Let say :math:`Z` is matrix of shape :math:`(C, m)` where ``C`` is no of classes and ``m`` is no of training samples. And :math:`z` is a vector of values :math:`[z_1, z_2,...z_c]` then the softmax output of vector ``z`` is following equation.
+
+
+    .. math::
+        A(z_i) = \\frac{e^{z_i}}{\\sum_{i=1}^{C}e^{z_i}}
     """
    # print("Z.shape: ", Z.shape)
     Z_shifted = Z - np.max(Z, axis=0, keepdims=True)    
@@ -123,6 +144,22 @@ def Softmax(Z):
     return A
 
 def dropout(A, keep_prob=0.8):
+    """
+    Dropout helps regularize the network by randomly shutting down the units. The intuition is that, any single neuron cannot rely on single feature or input, because, it any time it can go off, and that's why it will be reluctunt to give more weight to any single input or feature.
+
+    Specifically here I have installed ``Inverted Dropout``.
+    
+    With Dropout the feedforward operation becames.
+
+    .. math::
+        D \\sim Bernouli(keepprob)
+
+        Z = W.X + b
+
+        A = g(Z)
+
+        A = \\frac{A*D}{keep_prob}
+    """
     D = np.random.rand(A.shape[0], A.shape[1])
     D = (D < keep_prob).astype(int)
     A = A*D
@@ -132,6 +169,10 @@ def dropout(A, keep_prob=0.8):
     return A, cache
 
 def neuron(W, X, b, a_name="relu", drpout=False, keep_prob=0.5):
+    """
+    This function can work as a single neuron or a single layer which computes linear->activation function with the help of previously defined atomic function. This takes weight & bias metrix, output of previous layer or input in case of first layer, activation, dropout, and keep_prob. You can directly use this function as a layer where you give input and you get output.
+
+    """
     Z, linear_cache = linear(W, X, b)
     A, activation_cache = activation(Z, a_name)
     dropout_cache = None

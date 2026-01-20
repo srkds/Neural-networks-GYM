@@ -59,3 +59,4 @@ extensions += ["sphinx.ext.githubpages"]
 autodoc_mock_imports = [
     "numpy",
 ]
+
