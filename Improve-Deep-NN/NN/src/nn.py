@@ -33,14 +33,20 @@ def initialize_parameters(layer_dims):
 
     And the :math:`parameters = {W^{[1]}, b^{[1]}, ..., W^{[L]}, b^{[L]}}`
 
-    returns
-    --------
-    >>> parameters: dictionary {
-    >>>    "W1": {}, layer 1
-    >>>    "b1": ,
-    >>>    ...
-    >>> }
-
+    Examples::
+        >>> nx = 3
+        >>> layer_dims = [nx, 4, 4, 1]
+        >>> parameters = initialize_parameters(layer_dims)
+        >>> len(parameters)
+        6
+        >>> parameters["W1"].shape
+        (4, 3)
+        >>> parameters["W2"].shape
+        (4, 4)
+        >>> parameters["W3"].shape
+        (1, 4)
+        >>> parameters["b1"].shape
+        (4, 1)
     """
     parameters = {}
     L = len(layer_dims)
@@ -209,6 +215,12 @@ def forward_propagation(parameters, X, dropout_size, multiclass=False):
 
 # BCE Binary cross entropy loss function
 def BCE(Y, yh):
+    """
+        This function computes the Binary Cross Entropy cost function.
+
+        .. math::
+            J() = - Y log(\\hat{Y}) + (1-Y) log(1-\\hat{Y})
+    """
     epsilon = 0.001
     bce_cost = -np.sum(np.multiply(Y,np.log(yh)) + np.multiply((1-Y), np.log(1-yh))) / Y.shape[1]
     return bce_cost
@@ -252,7 +264,16 @@ def compute_cost(Y, yh, parameters, c_name='BCE', lambd=0.0):
 
 # Loss cross entropy
 def CE(s, y):
-    """Cross entropy loss function for softmax"""
+    """Cross entropy loss function for softmax
+
+    .. math:: 
+
+        L(Y,S) = \\sum_{i=1}^{C} Y_i.log(S_i)
+
+        J(W,b) = \\sum_{j=1}^{m}L(Y^j, S^j)
+
+    Here :math:`L` is loss function, calculates how well our model is performing on single training example for all classes :math:`C`. And :math:`J` is cost function that calculates loss for all the samples in training examples
+    """
     m = y.shape[1] # no of training examples
     #print("m: ", m)
     #print(s)

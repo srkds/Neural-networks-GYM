@@ -160,16 +160,22 @@
 layer_dims : eg [nx, layer_1, 2, 3]</p>
 <p>Let <span class="math notranslate nohighlight">\(L\)</span> be a no of layers and <span class="math notranslate nohighlight">\(\text{layer_dims} = [n_0, n_1, ..., n_L]\)</span> where <span class="math notranslate nohighlight">\(n_l\)</span> denotes no of neurons in <span class="math notranslate nohighlight">\(l^{th}\)</span> layer. then the <span class="math notranslate nohighlight">\(W\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are weight and bias matrix, where <span class="math notranslate nohighlight">\(W^{[l]} \in R^{n_l \times n_{l-1}}\)</span>, <span class="math notranslate nohighlight">\(b^{[l]} \in R^{n_l \times 1}\)</span>.</p>
 <p>And the <span class="math notranslate nohighlight">\(parameters = {W^{[1]}, b^{[1]}, ..., W^{[L]}, b^{[L]}}\)</span></p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>&gt;&gt;&gt; parameters</strong> (<em>dictionary {</em>)</p></li>
-<li><p><strong>&gt;&gt;&gt;    “W1”</strong> (<em>{}, layer 1</em>)</p></li>
-<li><p><strong>&gt;&gt;&gt;    “b1”</strong> (<em>,</em>)</p></li>
-<li><p><em>&gt;&gt;&gt;    …</em></p></li>
-<li><p><em>&gt;&gt;&gt; }</em></p></li>
-</ul>
-</p>
+<dl>
+<dt>Examples::</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">layer_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">nx</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameters</span> <span class="o">=</span> <span class="n">initialize_parameters</span><span class="p">(</span><span class="n">layer_dims</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+<span class="go">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;W1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(4, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;W2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(4, 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;W3&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;b1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(4, 1)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 </dd></dl>
@@ -216,6 +222,7 @@ layer_dims : eg [nx, layer_1, 2, 3]</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="regularization.html">Regularization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost_function.html">Cost Function</a></li>
 </ul>
 
 <div class="relations">
